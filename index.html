@@ -65,7 +65,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles-2035.css">
+<link rel="stylesheet" href="styles-2036.css">
 </head>
 <body>
 
@@ -249,6 +249,20 @@
         <p class="addr">Sessions available in person and at a distance. Ceremonies travel to you.</p>
       </div>
     </div>
+    <div class="contact-card msg-card reveal">
+      <h3>Send Christine a Message</h3>
+      <form id="msg-form">
+        <div class="f-grid">
+          <div class="f-field"><label for="mf-name">Name</label><input id="mf-name" name="name" type="text" required autocomplete="name"></div>
+          <div class="f-field"><label for="mf-email">Email</label><input id="mf-email" name="email" type="email" required autocomplete="email"></div>
+          <div class="f-field"><label for="mf-phone">Phone <span class="opt">(optional)</span></label><input id="mf-phone" name="phone" type="tel" autocomplete="tel"></div>
+          <div class="f-field f-full"><label for="mf-message">Message</label><textarea id="mf-message" name="message" required></textarea></div>
+        </div>
+        <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off">
+        <button class="btn" type="submit" id="mf-send">Send Message</button>
+        <p class="f-note" id="mf-note" hidden></p>
+      </form>
+    </div>
     <div class="contact-booking"><a class="btn" href="https://cal.com/hhpwines" target="_blank" rel="noopener">Book a Session</a></div>
   </div>
 </section>
@@ -267,6 +281,31 @@
   addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), {passive:true});
   const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), {threshold:.12});
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  const mf = document.getElementById('msg-form');
+  mf.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('mf-send');
+    const note = document.getElementById('mf-note');
+    btn.disabled = true; btn.textContent = 'Sending…'; note.hidden = true;
+    const data = {
+      name: document.getElementById('mf-name').value,
+      email: document.getElementById('mf-email').value,
+      phone: document.getElementById('mf-phone').value,
+      message: document.getElementById('mf-message').value,
+      _subject: 'Website question — Loving Spirit Healing & Ceremonies',
+      _template: 'table',
+      _honey: ''
+    };
+    try {
+      const r = await fetch('https://formsubmit.co/ajax/hhpwines@aol.com', {method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify(data)});
+      if (!r.ok) throw new Error('send failed');
+      mf.innerHTML = '<p class="f-thanks">Thank you, your message was sent. Christine will get back to you soon.</p>';
+    } catch (err) {
+      note.textContent = 'Something went wrong sending your message. Please reach Christine on WhatsApp or by email instead.';
+      note.hidden = false;
+      btn.disabled = false; btn.textContent = 'Send Message';
+    }
+  });
 </script>
 </body>
 </html>
